@@ -48,21 +48,19 @@ bool convertMeshToGeo(const MeshLib::Mesh &mesh, GeoLib::GEOObjects* geo_objects
 	// elements to surface triangles conversion
 	std::vector<MeshLib::Element*> const& elements = mesh.getElements();
 	GeoLib::Surface* sfc = new GeoLib::Surface(*points);
-	const unsigned nElems (mesh.getNElements());
 
-	for (unsigned i=0; i<nElems; ++i)
-	{
-		MeshLib::Element* e (elements[i]);
-		if (e->getGeomType() == MshElemType::TRIANGLE)
-			sfc->addTriangle(e->getNodeIndex(0), e->getNodeIndex(1), e->getNodeIndex(2));
-		if (e->getGeomType() == MshElemType::QUAD)
-		{
-			sfc->addTriangle(e->getNodeIndex(0), e->getNodeIndex(1), e->getNodeIndex(2));
-			sfc->addTriangle(e->getNodeIndex(0), e->getNodeIndex(2), e->getNodeIndex(3));
-		}
-		// all other element types are ignored (i.e. lines)
-	}
-	
+	std::for_each(elements.begin(), elements.end(),
+		[&sfc](MeshLib::Element const * const e){
+			if (e->getGeomType() == MshElemType::TRIANGLE)
+				sfc->addTriangle(e->getNodeIndex(0), e->getNodeIndex(1), e->getNodeIndex(2));
+			if (e->getGeomType() == MshElemType::QUAD)
+			{
+				sfc->addTriangle(e->getNodeIndex(0), e->getNodeIndex(1), e->getNodeIndex(2));
+				sfc->addTriangle(e->getNodeIndex(0), e->getNodeIndex(2), e->getNodeIndex(3));
+			}
+			// all other element types are ignored (i.e. lines)
+		});
+
 	std::vector<GeoLib::Surface*> *sfcs = new std::vector<GeoLib::Surface*>(1);
 	(*sfcs)[0] = sfc;
 
