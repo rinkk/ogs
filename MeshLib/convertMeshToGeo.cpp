@@ -42,12 +42,12 @@ bool convertMeshToGeo(const MeshLib::Mesh &mesh, GeoLib::GEOObjects* geo_objects
 	std::size_t const nNodes (mesh.getNNodes());
 	std::vector<GeoLib::Point*> *points = new std::vector<GeoLib::Point*>();
 	points->resize(nNodes);
-	const std::vector<MeshLib::Node*> nodes = mesh.getNodes();
+	std::vector<MeshLib::Node*> const& nodes = mesh.getNodes();
 	std::transform(nodes.begin(), nodes.end(), std::back_inserter(*points),
 		[](MeshLib::Node const * const node) { return new GeoLib::Point(*node); });
 
 	// elements to surface triangles conversion
-	const std::vector<MeshLib::Element*> elements = mesh.getElements();
+	std::vector<MeshLib::Element*> const& elements = mesh.getElements();
 	GeoLib::Surface* sfc = new GeoLib::Surface(*points);
 	const unsigned nElems (mesh.getNElements());
 
