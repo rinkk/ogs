@@ -36,7 +36,7 @@ bool convertMeshToGeo(const MeshLib::Mesh &mesh, GeoLib::GEOObjects* geo_objects
 	}
 	
 	// nodes to points conversion
-	const unsigned nNodes (mesh.getNNodes());
+	std::size_t const nNodes (mesh.getNNodes());
 	std::vector<GeoLib::Point*> *points = new std::vector<GeoLib::Point*>(nNodes);
 	const std::vector<MeshLib::Node*> nodes = mesh.getNodes();
 
