@@ -73,9 +73,8 @@ int main (int argc, char* argv[])
 				const size_t n_triangles (sfc->getNTriangles());
 				for (size_t j(0); j < n_triangles; j++)
 				{
-					GeoLib::Triangle const* tri ((*sfc)[j]);
 					for (size_t i(0); i < 3; i++)
-						sfc_pnt_ids.push_back ((*tri)[i]);
+						sfc_pnt_ids.push_back (sfc->getTrianglesPointId(j, i));
 				}
 			}
 	}

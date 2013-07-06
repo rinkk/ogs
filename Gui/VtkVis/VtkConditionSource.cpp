@@ -212,10 +212,9 @@ int VtkConditionSource::RequestData( vtkInformation* request,
 				vtkPolygon* aPolygon = vtkPolygon::New();
 				aPolygon->GetPointIds()->SetNumberOfIds(3);
 
-				const GeoLib::Triangle* triangle = (*sfc)[i];
 				for (size_t j = 0; j < 3; j++)
 				{
-					size_t point_index ((*triangle)[j]);
+					std::size_t const point_index = sfc->getTrianglesPointId(i, j);
 
 					if (point_idx_map[point_index] == -1)
 					{

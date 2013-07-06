@@ -120,10 +120,9 @@ TEST(FileIO, XmlGmlReaderTest)
 
 	GeoLib::Surface* sfc = (*sfcs)[1];
 	ASSERT_EQ(sfc->getNTriangles(), 2);
-	const GeoLib::Triangle* tri = (*sfc)[1];
-	ASSERT_EQ((*tri)[0],3);
-	ASSERT_EQ((*tri)[1],8);
-	ASSERT_EQ((*tri)[2],5);
+	ASSERT_EQ(sfc->getTrianglesPointId(1, 0), 3);
+	ASSERT_EQ(sfc->getTrianglesPointId(1, 1), 8);
+	ASSERT_EQ(sfc->getTrianglesPointId(1, 2), 5);
 
 	boost::filesystem::remove(test_data_file);
 	test_data_file += ".md5";

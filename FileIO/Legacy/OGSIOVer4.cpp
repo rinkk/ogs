@@ -727,11 +727,11 @@ void writeAllDataToGLIFileV4 (const std::string& fname, const GeoLib::GEOObjects
 				std::ofstream tin_os (sfc_name.c_str());
 				GeoLib::Surface const& sfc (*(*sfcs)[k]);
 				const std::size_t n_tris (sfc.getNTriangles());
-					for (std::size_t l(0); l < n_tris; l++) {
-						GeoLib::Triangle const& tri (*(sfc[l]));
-					tin_os << l << " " << *(tri.getPoint(0)) << " " <<
-					*(tri.getPoint(1)) << " " << *(tri.getPoint(2)) <<
-					"\n";
+				for (std::size_t l(0); l < n_tris; l++) {
+					tin_os << l << " "
+						<< sfc.getTrianglesPoint(l, 0) << " "
+						<< sfc.getTrianglesPoint(l, 1) << " "
+						<< sfc.getTrianglesPoint(l, 2) << "\n";
 				}
 				tin_os.close();
 

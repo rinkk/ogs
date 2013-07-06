@@ -328,15 +328,15 @@ void FEMConditionSetupDialog::copyCondOnPoints()
 		size_t nTriangles = sfc->getNTriangles();
 		for (size_t i=0; i<nTriangles; i++)
 		{
-			const GeoLib::Triangle* tri = (*sfc)[i];
 			for (size_t j=0; j<3; j++)
 			{
 				FEMCondition* cond = new FEMCondition(_cond);
 				cond->setGeoObj(nullptr);
 				cond->setGeoType(GeoLib::POINT);
-				cond->setGeoName(_cond.getAssociatedGeometryName() + "_Point" + BaseLib::number2str((*tri)[j]));
+				cond->setGeoName(_cond.getAssociatedGeometryName() + "_Point"
+				    + BaseLib::number2str(sfc->getTrianglesPoint(i, j)));
 				cond->clearDisValues();
-				cond->setConstantDisValue((*tri->getPoint(j))[2]);
+				cond->setConstantDisValue(sfc->getTrianglesPoint(i, j)[2]);
 				conditions.push_back(this->typeCast(*cond));
 			}
 		}
