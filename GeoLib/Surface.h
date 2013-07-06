@@ -15,6 +15,7 @@
 #ifndef SURFACE_H_
 #define SURFACE_H_
 
+#include <array>
 #include <vector>
 
 #include "GeoObject.h"
@@ -84,8 +85,8 @@ public:
 protected:
 	/** a vector of pointers to Points */
 	const std::vector<Point*> &_sfc_pnts;
-	/** position of pointers to the geometric points */
-	std::vector<Triangle*> _sfc_triangles;
+	/// Point indices forming triangles.
+	std::vector<std::array<std::size_t, 3>> _sfc_triangles;
 	/** bounding volume is an axis aligned bounding box */
 	AABB<GeoLib::Point> *_bounding_volume;
 };
