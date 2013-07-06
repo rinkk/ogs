@@ -51,9 +51,8 @@ public:
 	 * */
 	std::size_t getNTriangles () const;
 
-	/** \brief const access operator for the access to the i-th Triangle of the surface.
-	*/
-	const Triangle* operator[] (std::size_t i) const;
+	/// Returns i-th triangle of the surface.
+	Triangle operator[] (std::size_t i) const;
 
 	/// Returns point id of a triangle in surface's points vector.
 	/// \see getPointVec().
