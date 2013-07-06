@@ -188,11 +188,9 @@ bool Triangle::containsPoint2D (const double *pnt) const
 	return false;
 }
 
-void getPlaneCoefficients(Triangle const& tri, double c[3])
+void getPlaneCoefficients(GeoLib::Point const& p0, GeoLib::Point const& p1,
+	GeoLib::Point const& p2, double c[3])
 {
-	GeoLib::Point const& p0 (*(tri.getPoint(0)));
-	GeoLib::Point const& p1 (*(tri.getPoint(1)));
-	GeoLib::Point const& p2 (*(tri.getPoint(2)));
 	MathLib::DenseMatrix<double> mat (3,3);
 	mat(0,0) = p0[0];
 	mat(0,1) = p0[1];
