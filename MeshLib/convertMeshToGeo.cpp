@@ -12,6 +12,9 @@
  *
  */
 
+#include <algorithm>
+#include <iterator>
+
 #include "convertMeshToGeo.h"
 
 // ThirdParty/logog
@@ -36,32 +39,28 @@ bool convertMeshToGeo(const MeshLib::Mesh &mesh, GeoLib::GEOObjects* geo_objects
 	}
 	
 	// nodes to points conversion
-	const unsigned nNodes (mesh.getNNodes());
-	std::vector<GeoLib::Point*> *points = new std::vector<GeoLib::Point*>(nNodes);
-	const std::vector<MeshLib::Node*> nodes = mesh.getNodes();
-
-	for (unsigned i=0; i<nNodes; ++i)
-		(*points)[i] = new GeoLib::Point(static_cast<GeoLib::Point>(*nodes[i]));
-
+	std::vector<GeoLib::Point*> *points = new std::vector<GeoLib::Point*>();
+	points->resize(mesh.getNNodes());
+	std::vector<MeshLib::Node*> const& nodes = mesh.getNodes();
+	std::transform(nodes.begin(), nodes.end(), std::back_inserter(*points),
+		[](MeshLib::Node const * const node) { return new GeoLib::Point(*node); });
 
 	// elements to surface triangles conversion
-	const std::vector<MeshLib::Element*> elements = mesh.getElements();
+	std::vector<MeshLib::Element*> const& elements = mesh.getElements();
 	GeoLib::Surface* sfc = new GeoLib::Surface(*points);
-	const unsigned nElems (mesh.getNElements());
 
-	for (unsigned i=0; i<nElems; ++i)
-	{
-		MeshLib::Element* e (elements[i]);
-		if (e->getGeomType() == MshElemType::TRIANGLE)
-			sfc->addTriangle(e->getNodeIndex(0), e->getNodeIndex(1), e->getNodeIndex(2));
-		if (e->getGeomType() == MshElemType::QUAD)
-		{
-			sfc->addTriangle(e->getNodeIndex(0), e->getNodeIndex(1), e->getNodeIndex(2));
-			sfc->addTriangle(e->getNodeIndex(0), e->getNodeIndex(2), e->getNodeIndex(3));
-		}
-		// all other element types are ignored (i.e. lines)
-	}
-	
+	std::for_each(elements.begin(), elements.end(),
+		[&sfc](MeshLib::Element const * const e){
+			if (e->getGeomType() == MshElemType::TRIANGLE)
+				sfc->addTriangle(e->getNodeIndex(0), e->getNodeIndex(1), e->getNodeIndex(2));
+			if (e->getGeomType() == MshElemType::QUAD)
+			{
+				sfc->addTriangle(e->getNodeIndex(0), e->getNodeIndex(1), e->getNodeIndex(2));
+				sfc->addTriangle(e->getNodeIndex(0), e->getNodeIndex(2), e->getNodeIndex(3));
+			}
+			// all other element types are ignored (i.e. lines)
+		});
+
 	std::vector<GeoLib::Surface*> *sfcs = new std::vector<GeoLib::Surface*>(1);
 	(*sfcs)[0] = sfc;
 

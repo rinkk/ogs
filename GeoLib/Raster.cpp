@@ -87,11 +87,14 @@ Raster* Raster::getRasterFromSurface(Surface const& sfc, double cell_size, doubl
 		for (size_t c(0); c < n_rows; c++) {
 			const double test_pnt[3] = { ll[0] + r*cell_size, ll[1] + c*cell_size, 0};
 			for (k=0; k<n_triangles; k++) {
-				if (sfc[k]->containsPoint2D(test_pnt)) {
-					Triangle const * const tri (sfc[k]);
+				if (sfc[k].containsPoint2D(test_pnt)) {
 					// compute coefficients c0, c1, c2 for the plane f(x,y) = c0 x + c1 y + c2
 					double coeff[3] = {0.0, 0.0, 0.0};
-					GeoLib::getPlaneCoefficients(*tri, coeff);
+					GeoLib::getPlaneCoefficients(
+					    sfc.getTrianglesPoint(k, 0),
+					    sfc.getTrianglesPoint(k, 1),
+					    sfc.getTrianglesPoint(k, 2),
+					    coeff);
 					z_vals[r*n_rows+c] = coeff[0] * test_pnt[0] + coeff[1] * test_pnt[1] + coeff[2];
 					break;
 				}

@@ -15,6 +15,7 @@
 #ifndef SURFACE_H_
 #define SURFACE_H_
 
+#include <array>
 #include <vector>
 
 #include "GeoObject.h"
@@ -51,9 +52,15 @@ public:
 	 * */
 	std::size_t getNTriangles () const;
 
-	/** \brief const access operator for the access to the i-th Triangle of the surface.
-	*/
-	const Triangle* operator[] (std::size_t i) const;
+	/// Returns i-th triangle of the surface.
+	Triangle operator[] (std::size_t i) const;
+
+	/// Returns point id of a triangle in surface's points vector.
+	/// \see getPointVec().
+	std::size_t getTrianglesPointId(std::size_t const tri_index, std::size_t const point_index) const;
+
+	/// Returns reference to surface's point of a triangle.
+	GeoLib::Point const& getTrianglesPoint(std::size_t const tri_index, std::size_t const point_index) const;
 
 	/**
 	 * is the given point in the bounding volume of the surface
@@ -78,8 +85,8 @@ public:
 protected:
 	/** a vector of pointers to Points */
 	const std::vector<Point*> &_sfc_pnts;
-	/** position of pointers to the geometric points */
-	std::vector<Triangle*> _sfc_triangles;
+	/// Point indices forming triangles.
+	std::vector<std::array<std::size_t, 3>> _sfc_triangles;
 	/** bounding volume is an axis aligned bounding box */
 	AABB<GeoLib::Point> *_bounding_volume;
 };

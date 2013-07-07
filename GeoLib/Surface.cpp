@@ -34,8 +34,6 @@ Surface::Surface (const std::vector<Point*> &pnt_vec) :
 
 Surface::~Surface ()
 {
-	for (std::size_t k(0); k < _sfc_triangles.size(); k++)
-		delete _sfc_triangles[k];
 	delete _bounding_volume;
 }
 
@@ -47,7 +45,7 @@ void Surface::addTriangle (std::size_t pnt_a, std::size_t pnt_b, std::size_t pnt
 	if (pnt_a == pnt_b || pnt_a == pnt_c || pnt_b == pnt_c)
 		return;
 
-	_sfc_triangles.push_back (new Triangle(_sfc_pnts, pnt_a, pnt_b, pnt_c));
+	_sfc_triangles.push_back({{ pnt_a, pnt_b, pnt_c }});
 	if (!_bounding_volume) {
 		std::vector<size_t> ids(3);
 		ids[0] = pnt_a;
@@ -109,10 +107,25 @@ std::size_t Surface::getNTriangles () const
 	return _sfc_triangles.size();
 }
 
-const Triangle* Surface::operator[] (std::size_t i) const
+std::size_t Surface::getTrianglesPointId(std::size_t const tri_index, std::size_t const point_index) const
+{
+	assert (tri_index < _sfc_triangles.size());
+	return _sfc_triangles[tri_index][point_index % 3];
+}
+
+GeoLib::Point const& Surface::getTrianglesPoint(std::size_t const tri_index, std::size_t const point_index) const
+{
+	return *_sfc_pnts[this->getTrianglesPointId(tri_index, point_index)];
+}
+
+Triangle Surface::operator[] (std::size_t i) const
 {
 	assert (i < _sfc_triangles.size());
-	return _sfc_triangles[i];
+	return Triangle(
+	    _sfc_pnts,
+	    _sfc_triangles[i][0],
+	    _sfc_triangles[i][1],
+	    _sfc_triangles[i][2]);
 }
 
 bool Surface::isPntInBoundingVolume(const double *pnt) const
@@ -124,7 +137,7 @@ bool Surface::isPntInSfc (const double *pnt) const
 {
 	bool nfound (true);
 	for (std::size_t k(0); k<_sfc_triangles.size() && nfound; k++) {
-		if (_sfc_triangles[k]->containsPoint (pnt)) {
+		if ((*this)[k].containsPoint (pnt)) {
 			nfound = false;
 		}
 	}

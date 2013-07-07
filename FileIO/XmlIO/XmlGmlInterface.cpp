@@ -357,13 +357,14 @@ int XmlGmlInterface::write(std::ostream& stream)
 					sfcListTag.appendChild(surfaceTag);
 
 					// writing the elements compromising the surface
-					std::size_t nElements = ((*surfaces)[i])->getNTriangles();
+					GeoLib::Surface const& s = *((*surfaces)[i]);
+					std::size_t nElements = s.getNTriangles();
 					for (std::size_t j = 0; j < nElements; j++)
 					{
 						QDomElement elementTag = doc.createElement("element");
-						elementTag.setAttribute("p1", QString::number((*(*(*surfaces)[i])[j])[0]));
-						elementTag.setAttribute("p2", QString::number((*(*(*surfaces)[i])[j])[1]));
-						elementTag.setAttribute("p3", QString::number((*(*(*surfaces)[i])[j])[2]));
+						elementTag.setAttribute("p1", QString::number(s.getTrianglesPointId(j, 0)));
+						elementTag.setAttribute("p2", QString::number(s.getTrianglesPointId(j, 1)));
+						elementTag.setAttribute("p3", QString::number(s.getTrianglesPointId(j, 2)));
 						surfaceTag.appendChild(elementTag);
 					}
 				}
