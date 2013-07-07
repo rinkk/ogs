@@ -12,6 +12,9 @@
  *
  */
 
+#include <algorithm>
+#include <iterator>
+
 #include "convertMeshToGeo.h"
 
 // ThirdParty/logog
@@ -37,12 +40,11 @@ bool convertMeshToGeo(const MeshLib::Mesh &mesh, GeoLib::GEOObjects* geo_objects
 	
 	// nodes to points conversion
 	std::size_t const nNodes (mesh.getNNodes());
-	std::vector<GeoLib::Point*> *points = new std::vector<GeoLib::Point*>(nNodes);
+	std::vector<GeoLib::Point*> *points = new std::vector<GeoLib::Point*>();
+	points->resize(nNodes);
 	const std::vector<MeshLib::Node*> nodes = mesh.getNodes();
-
-	for (unsigned i=0; i<nNodes; ++i)
-		(*points)[i] = new GeoLib::Point(static_cast<GeoLib::Point>(*nodes[i]));
-
+	std::transform(nodes.begin(), nodes.end(), std::back_inserter(*points),
+		[](MeshLib::Node const * const node) { return new GeoLib::Point(*node); });
 
 	// elements to surface triangles conversion
 	const std::vector<MeshLib::Element*> elements = mesh.getElements();
