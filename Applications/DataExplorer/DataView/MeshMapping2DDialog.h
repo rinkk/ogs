@@ -26,12 +26,12 @@ class MeshMapping2DDialog : public QDialog, private Ui_MeshMapping2D
 public:
 	MeshMapping2DDialog(QDialog* parent = nullptr);
 
-	bool useRasterMapping() const { return this->rasterValueButton->isChecked(); }
-	bool useStaticMapping() const { return this->staticValueButton->isChecked(); }
-	std::string getRasterPath() const { return this->rasterPathEdit->text().toStdString(); }
-	double getNoDataReplacement() const { return this->noDataValueEdit->text().toDouble(); }
-	double getStaticValue() const { return this->staticValueEdit->text().toDouble(); }
-	std::string getNewMeshName() const { return this->newNameEdit->text().toStdString(); }
+	bool useRasterMapping() const { return rasterValueButton->isChecked(); }
+	bool useStaticMapping() const { return staticValueButton->isChecked(); }
+	std::string getRasterPath() const { return rasterPathEdit->text().toStdString(); }
+	double getNoDataReplacement() const { return noDataValueEdit->text().toDouble(); }
+	double getStaticValue() const { return staticValueEdit->text().toDouble(); }
+	std::string getNewMeshName() const { return newNameEdit->text().toStdString(); }
 
 private slots:
 	void on_rasterValueButton_toggled(bool isChecked);
@@ -41,7 +41,7 @@ private slots:
 	void accept();
 
 	/// Instructions if the Cancel-Button has been pressed.
-	void reject() { this->done(QDialog::Rejected); }
+	void reject() { done(QDialog::Rejected); }
 };
 
 #endif //MESHMAPPING2DDIALOG_H
