@@ -34,6 +34,7 @@ set(CONAN_REQUIRES
 set(CONAN_OPTIONS
     Boost:header_only=True
     Qt:qtxmlpatterns=True
+    Qt:qtwebengine=True
     VTK:minimal=True
     VTK:ioxml=True
     CACHE INTERNAL ""

@@ -17,6 +17,7 @@
 #include "ui_DiagramPrefs.h"
 #include <QMainWindow>
 
+#include <QWebEngineView>
 
 class DetailWindow;
 class DiagramList;
@@ -100,6 +101,8 @@ private:
     int _listID;
     int _stationID;
     DetailWindow* _window;
+
+    WebEngineView* _view;
 
 private slots:
     /// Instructions if the OK-Button has been pressed.

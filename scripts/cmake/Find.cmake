@@ -97,7 +97,7 @@ find_package(Metis QUIET)
 
 ## Qt5 library ##
 if(OGS_BUILD_GUI)
-    set(QT_MODULES Gui Widgets Xml XmlPatterns)
+    set(QT_MODULES Gui Widgets Xml XmlPatterns WebEngine)
     if(OGS_USE_CONAN AND UNIX AND NOT APPLE)
         set(QT_MODULES ${QT_MODULES} X11Extras)
     endif()

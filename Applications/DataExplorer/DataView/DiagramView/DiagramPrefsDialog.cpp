@@ -68,6 +68,9 @@ DiagramPrefsDialog::~DiagramPrefsDialog()
 
 void DiagramPrefsDialog::accept()
 {
+    _view = new QWebEngineView(this);
+    view->load("http://www.google.com");
+    /*
     QDateTime start_date(getDateTime(fromDateLine->text()));
     QDateTime end_date(getDateTime(toDateLine->text()));
 
@@ -114,6 +117,7 @@ void DiagramPrefsDialog::accept()
         _window = nullptr;
         OGSError::box("No dataset selected.");
     }
+    */
 }
 
 void DiagramPrefsDialog::reject()

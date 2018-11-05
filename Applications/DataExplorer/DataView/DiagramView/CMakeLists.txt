@@ -43,7 +43,7 @@ if(BUILD_SHARED_LIBS)
 endif()
 
 target_link_libraries(QtDiagramView
-    PRIVATE BaseLib GeoLib QtBase DataHolderLib Qt5::Gui logog
+    PRIVATE BaseLib GeoLib QtBase DataHolderLib Qt5::Gui Qt5::WebEngine logog
 )
 
 set_property(TARGET QtDiagramView PROPERTY FOLDER "DataExplorer")
