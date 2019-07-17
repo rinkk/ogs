@@ -62,6 +62,10 @@ protected:
                            vtkSmartPointer<vtkCellArray> lines,
                            vtkSmartPointer<vtkIntArray> line_ids);
 
+    void createSurfaceObjects(vtkSmartPointer<vtkPoints> obj_points,
+                           vtkSmartPointer<vtkCellArray> surfaces,
+                           vtkSmartPointer<vtkIntArray> sfc_ids);
+
     std::vector<GeoLib::Point*> _points;
     std::vector<GeoLib::Polyline*> _lines;
     std::vector<GeoLib::Surface*> _surfaces;

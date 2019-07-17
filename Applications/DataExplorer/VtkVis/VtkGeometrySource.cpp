@@ -24,10 +24,12 @@
 #include <vtkPolyData.h>
 #include <vtkProperty.h>
 #include <vtkStreamingDemandDrivenPipeline.h>
+#include <vtkTriangle.h>
 
 #include "GeoLib/Point.h"
 #include "GeoLib/Polyline.h"
 #include "GeoLib/Surface.h"
+#include "GeoLib/Triangle.h"
 
 vtkStandardNewMacro(VtkGeometrySource);
 
@@ -48,7 +50,7 @@ void VtkGeometrySource::setGeometry(GeoLib::GEOObjects const& geo_objects,
 
 void VtkGeometrySource::PrintSelf(ostream& os, vtkIndent indent)
 {
-    this->Superclass::PrintSelf(os,indent);
+    this->Superclass::PrintSelf(os, indent);
 }
 
 int VtkGeometrySource::RequestData(vtkInformation* request,
@@ -63,9 +65,6 @@ int VtkGeometrySource::RequestData(vtkInformation* request,
         ERR("VtkPolylineSource::RequestData(): No data to process.");
         return 0;
     }
-    
-    //vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
-    //vtkSmartPointer<vtkCellArray> newLines = vtkSmartPointer<vtkCellArray>::New();
 
     vtkSmartPointer<vtkPoints> obj_points = vtkSmartPointer<vtkPoints>::New();
     obj_points->SetNumberOfPoints(_points.size());
@@ -83,19 +82,37 @@ int VtkGeometrySource::RequestData(vtkInformation* request,
     output_points->SetPoints(obj_points);
     output_points->SetVerts(vertices);
     output_points->GetCellData()->AddArray(point_ids);
-    output_points->GetCellData()->SetActiveAttribute("PointIDs", vtkDataSetAttributes::SCALARS);
+    output_points->GetCellData()->SetActiveAttribute(
+        "PointIDs", vtkDataSetAttributes::SCALARS);
+    output_points->Squeeze();
 
-    vtkSmartPointer<vtkCellArray> lines =  vtkSmartPointer<vtkCellArray>::New();
-    vtkSmartPointer<vtkIntArray> line_ids = vtkSmartPointer<vtkIntArray>::New();
-    createLineObjects(obj_points, lines, line_ids);
     vtkSmartPointer<vtkPolyData> output_lines = vtkPolyData::New();
-    output_lines->SetPoints(obj_points);
-    output_lines->SetLines(lines);
-    output_lines->GetCellData()->AddArray(line_ids);
-    output_lines->GetCellData()->SetActiveAttribute("PolylineIDs", vtkDataSetAttributes::SCALARS);
-    output_lines->Squeeze();
+    if (!_lines.empty())
+    {
+        vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
+        vtkSmartPointer<vtkIntArray> line_ids = vtkSmartPointer<vtkIntArray>::New();
+        createLineObjects(obj_points, lines, line_ids);
+        output_lines->SetPoints(obj_points);
+        output_lines->SetLines(lines);
+        output_lines->GetCellData()->AddArray(line_ids);
+        output_lines->GetCellData()->SetActiveAttribute(
+            "PolylineIDs", vtkDataSetAttributes::SCALARS);
+        output_lines->Squeeze();
+    }
 
-    //vtkSmartPointer<vtkPolyData> output_surfaces = vtkPolyData::New();
+    vtkSmartPointer<vtkPolyData> output_surfaces = vtkPolyData::New();
+    if (!_surfaces.empty())
+    {
+        vtkSmartPointer<vtkCellArray> surfaces = vtkSmartPointer<vtkCellArray>::New();
+        vtkSmartPointer<vtkIntArray> sfc_ids = vtkSmartPointer<vtkIntArray>::New();
+        createLineObjects(obj_points, surfaces, sfc_ids);
+        output_surfaces->SetPoints(obj_points);
+        output_surfaces->SetPolys(surfaces);
+        output_surfaces->GetCellData()->AddArray(sfc_ids);
+        output_surfaces->GetCellData()->SetActiveAttribute(
+            "SurfaceIDs", vtkDataSetAttributes::SCALARS);
+        output_surfaces->Squeeze();
+    }
 
     vtkSmartPointer<vtkInformation> out_info_obj = outputVector->GetInformationObject(0);
     vtkSmartPointer<vtkMultiBlockDataSet> output =
@@ -104,17 +121,18 @@ int VtkGeometrySource::RequestData(vtkInformation* request,
         return 1;
 
     output->SetBlock(0, output_points);
-    output->SetBlock(1, output_lines);
-    //output->SetBlock(2, output_surfaces);
+    if (!_lines.empty())
+        output->SetBlock(1, output_lines);
+    if (!_surfaces.empty())
+        output->SetBlock(2, output_surfaces);
 
     return 1;
 }
 
-void VtkGeometrySource::createVertices(
-    vtkSmartPointer<vtkCellArray> vertices,
-    vtkSmartPointer<vtkIntArray> point_ids)
+void VtkGeometrySource::createVertices(vtkSmartPointer<vtkCellArray> vertices,
+                                       vtkSmartPointer<vtkIntArray> point_ids)
 {
-    std::size_t n_points (_points.size());
+    std::size_t const n_points(_points.size());
     vertices->Allocate(n_points);
     point_ids->SetNumberOfComponents(1);
     point_ids->SetNumberOfValues(n_points);
@@ -127,12 +145,11 @@ void VtkGeometrySource::createVertices(
     }
 }
 
-void VtkGeometrySource::createLineObjects(
-    vtkSmartPointer<vtkPoints> obj_points,
-    vtkSmartPointer<vtkCellArray> lines,
-    vtkSmartPointer<vtkIntArray> line_ids)
+void VtkGeometrySource::createLineObjects(vtkSmartPointer<vtkPoints> obj_points,
+                                          vtkSmartPointer<vtkCellArray> lines,
+                                          vtkSmartPointer<vtkIntArray> line_ids)
 {
-    std::size_t n_lines(_lines.size());
+    std::size_t const n_lines(_lines.size());
     lines->Allocate(n_lines);
     line_ids->Allocate(n_lines);
     line_ids->SetNumberOfComponents(1);
@@ -152,7 +169,35 @@ void VtkGeometrySource::createLineObjects(
     }
 }
 
+void VtkGeometrySource::createSurfaceObjects(vtkSmartPointer<vtkPoints> obj_points,
+                                             vtkSmartPointer<vtkCellArray> surfaces,
+                                             vtkSmartPointer<vtkIntArray> sfc_ids)
+{
+    int const n_surfaces (_surfaces.size());
+    surfaces->Allocate(n_surfaces);
+    sfc_ids->Allocate(n_surfaces);
+    sfc_ids->SetNumberOfComponents(1);
+    sfc_ids->SetName("SurfaceIDs");
 
+    int count = 0;
+    for (auto surface : _surfaces)
+    {
+        std::size_t const nTriangles = surface->getNumberOfTriangles();
+        for (std::size_t i = 0; i < nTriangles; ++i)
+        {
+            vtkTriangle* new_tri = vtkTriangle::New();
+            new_tri->GetPointIds()->SetNumberOfIds(3);
+
+            const GeoLib::Triangle* triangle = (*surface)[i];
+            for (std::size_t j = 0; j < 3; ++j)
+                new_tri->GetPointIds()->SetId(j, ((*triangle)[j]));
+            surfaces->InsertNextCell(new_tri);
+            sfc_ids->InsertNextValue(count);
+            new_tri->Delete();
+        }
+        count++;
+    }
+}
 
 int VtkGeometrySource::RequestInformation(
     vtkInformation* /*request*/,
