@@ -14,6 +14,10 @@
 
 #include "mainwindow.h"
 
+#include "VtkGeometrySource.h"
+#include <vtkXMLMultiBlockDataWriter.h>
+#include <vtkMultiBlockDataSet.h>
+
 #include <logog/include/logog.hpp>
 
 // Qt includes
@@ -1210,6 +1214,21 @@ void MainWindow::showDataExplorerSettingsDialog()
 
 void MainWindow::FEMTestStart()
 {
+    vtkSmartPointer<VtkGeometrySource> source =
+        vtkSmartPointer<VtkGeometrySource>::New();
+    GeoLib::GEOObjects const& geo = _geo_model->getGeoObjects();
+    source->setGeometry(geo, "BrunnenGOK_Outline_ModellHH.gli");
+    source->Update();
+    vtkMultiBlockDataSet* mb = source->GetOutput();
+
+    vtkSmartPointer<vtkXMLMultiBlockDataWriter> writer =
+        vtkSmartPointer<vtkXMLMultiBlockDataWriter>::New();
+    writer->SetDataModeToBinary();
+    writer->SetCompressorTypeToZLib();
+    writer->SetInputData(mb);
+    writer->SetFileName("d:/test.vtm");
+    writer->Update();
+    writer->Write();
 }
 
 void MainWindow::ShowWindow()

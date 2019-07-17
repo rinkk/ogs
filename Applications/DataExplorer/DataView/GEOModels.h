@@ -43,6 +43,7 @@ public:
 
     GeoTreeModel* getGeoModel() { return _geoModel; }
     StationTreeModel* getStationModel() { return _stationModel; }
+    GeoLib::GEOObjects const& getGeoObjects() { return _geo_objects; }
 
 public slots:
     /**

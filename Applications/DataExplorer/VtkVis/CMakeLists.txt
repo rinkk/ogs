@@ -30,6 +30,7 @@ set(SOURCES
     VtkCustomInteractorStyle.cpp
     VtkFilterFactory.cpp
     VtkGeoImageSource.cpp
+    VtkGeometrySource.cpp
     VtkImageDataToLinePolyDataFilter.cpp
     VtkImageDataToPointCloudFilter.cpp
     VtkImageDataToSurfacePointsFilter.cpp
@@ -81,6 +82,7 @@ set(HEADERS
     VtkCustomInteractorStyle.h
     VtkFilterFactory.h
     VtkGeoImageSource.h
+    VtkGeometrySource.h
     VtkImageDataToLinePolyDataFilter.h
     VtkImageDataToPointCloudFilter.h
     VtkImageDataToSurfacePointsFilter.h
@@ -146,6 +148,11 @@ if (OGS_USE_NETCDF)
     target_link_libraries(VtkVis PRIVATE NetCdfDialogLib)
 endif()
 
+if(NOT APPLE AND OGS_USE_CONAN)
+    # HACK for unresolved external
+    #target_link_libraries(VtkVis PUBLIC vtkGUISupportQt-8.1)
+    target_link_libraries(VtkVis PUBLIC vtkGUISupportQt)
+endif()
 set_property(TARGET VtkVis PROPERTY FOLDER "DataExplorer")
 
 add_autogen_include(VtkVis)
